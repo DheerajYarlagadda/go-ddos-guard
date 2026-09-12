@@ -40,8 +40,12 @@ func (r *RateLimiter) RecentRequestCount(clientID string, window time.Duration) 
 }
 
 func (r *RateLimiter) Allow(entry LogEntry) bool {
-	recentRequestCount := r.RecentRequestCount(entry.ClientID, 5*time.Second)
-	if recentRequestCount >= 5 {
+	return r.AllowCustom(entry, 2*time.Second, 5)
+}
+
+func (r *RateLimiter) AllowCustom(entry LogEntry, window time.Duration, maxRequests int) bool {
+	recentRequestCount := r.RecentRequestCount(entry.ClientID, window)
+	if recentRequestCount >= maxRequests {
 		return false
 	}
 	r.requests[entry.ClientID] = append(r.requests[entry.ClientID], entry.Timestamp)
