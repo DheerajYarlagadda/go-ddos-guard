@@ -3,18 +3,16 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"go-ddos-guard/ratelimiter"
 )
 
 func main() {
-	rL := NewRateLimiter()
-	entry := LogEntry{ClientID: "client-1", Timestamp: time.Now()}
+	rL := ratelimiter.NewRateLimiter()
+
 	for i := 1; i <= 6; i++ {
+		entry := ratelimiter.LogEntry{ClientID: "client-1", Timestamp: time.Now()}
 		allowed := rL.Allow(entry)
-		requestCount := rL.RequestCount(entry.ClientID)
-		if allowed {
-			fmt.Printf("request %d: allowed=%t, count=%d\n", i, allowed, requestCount)
-		} else {
-			fmt.Println("the request is not allowed because the request count ", requestCount, "is over the limit")
-		}
+		fmt.Printf("request %d: allowed=%t\n", i, allowed)
 	}
 }
